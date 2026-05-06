@@ -1,0 +1,227 @@
+[
+  {
+    "id": 1,
+    "title": "Captura lo invisible",
+    "description": "Fotografía algo que nadie más nota en tu día. Puede ser una sombra curiosa, una textura olvidada, o ese rincón que siempre ignoras. La belleza está en los detalles que el mundo pasa por alto.",
+    "query": "texture detail shadow close up photography",
+    "category": "creativo",
+    "difficulty": "fácil",
+    "duration": "15 min"
+  },
+  {
+    "id": 2,
+    "title": "Ese mensaje pendiente",
+    "description": "Hay alguien a quien hace tiempo que no le escribes. No para pedir nada, solo para decir que estás ahí. Una línea alcanza. El mundo necesita más gente que aparezca sin razón.",
+    "query": "friendship connection letters handwritten message",
+    "category": "conexión",
+    "difficulty": "fácil",
+    "duration": "10 min"
+  },
+  {
+    "id": 3,
+    "title": "Algo que nunca probaste",
+    "description": "Ve al supermercado o a una tienda de comida y compra algo que nunca hayas comido. No importa si es raro, exótico, o simplemente algo que siempre ignoraste. Hoy te lo comes.",
+    "query": "exotic food market fruits vegetables colorful",
+    "category": "aventura",
+    "difficulty": "fácil",
+    "duration": "30 min"
+  },
+  {
+    "id": 4,
+    "title": "La ruta que no tomas",
+    "description": "En tu próximo trayecto, toma un camino diferente al de siempre. Gira donde no giras, cruza esa calle desconocida. Puede que no llegues antes, pero verás algo nuevo.",
+    "query": "street walk city exploration path road",
+    "category": "aventura",
+    "difficulty": "fácil",
+    "duration": "20 min"
+  },
+  {
+    "id": 5,
+    "title": "Cielo, sin filtros",
+    "description": "Sal afuera y mira el cielo por 5 minutos. Sin teléfono, sin auriculares. Solo tú y lo que hay arriba. Nubes, estrellas, o el gris de lluvia. Existe aunque no lo mires.",
+    "query": "sky clouds sunset stars nature looking up",
+    "category": "mindfulness",
+    "difficulty": "fácil",
+    "duration": "5 min"
+  },
+  {
+    "id": 6,
+    "title": "Dibuja algo feo",
+    "description": "Toma un papel y dibuja algo. Cualquier cosa. Pero prohíbete juzgar el resultado. No hay arte malo en un cuaderno que nadie verá. Solo el acto de crear algo con tus manos.",
+    "query": "drawing sketch art paper pencil creative",
+    "category": "creativo",
+    "difficulty": "fácil",
+    "duration": "20 min"
+  },
+  {
+    "id": 7,
+    "title": "Primera página al azar",
+    "description": "Agarra el libro más cercano que tengas (o cualquiera en casa). Ábrelo en una página aleatoria y lee el primer párrafo que encuentres. Sin contexto, sin continuación. Solo ese momento.",
+    "query": "book reading library open pages literature",
+    "category": "conocimiento",
+    "difficulty": "fácil",
+    "duration": "10 min"
+  },
+  {
+    "id": 8,
+    "title": "Gracias en otro idioma",
+    "description": "Aprende a decir 'gracias' en un idioma que no conozcas. Luego úsalo en tu día: en un chat, con alguien, o solo para ti. Las palabras de otros mundos ensanchan el tuyo.",
+    "query": "language world culture travel globe diverse",
+    "category": "conocimiento",
+    "difficulty": "fácil",
+    "duration": "10 min"
+  },
+  {
+    "id": 9,
+    "title": "El álbum completo",
+    "description": "Pon un álbum de música que conozcas y escúchalo de principio a fin, sin saltarte canciones, sin hacer otra cosa al mismo tiempo. La música no fue diseñada para el fondo.",
+    "query": "music vinyl record headphones listening album",
+    "category": "arte",
+    "difficulty": "media",
+    "duration": "45 min"
+  },
+  {
+    "id": 10,
+    "title": "Habla con un desconocido",
+    "description": "Entabla una conversación breve con alguien que no conozcas hoy. El cajero, el vecino del ascensor, alguien en la fila. Un comentario genuino, sin agenda. Solo conexión humana.",
+    "query": "people conversation street cafe interaction human",
+    "category": "conexión",
+    "difficulty": "media",
+    "duration": "5 min"
+  },
+  {
+    "id": 11,
+    "title": "Tres razones ahora mismo",
+    "description": "Escribe en papel (no en el teléfono) tres cosas concretas que ahora mismo te hacen bien. No filosóficas ni grandes. Pueden ser el café de esta mañana, tu canción favorita o el frío de hoy.",
+    "query": "journal writing gratitude notebook pen paper",
+    "category": "mindfulness",
+    "difficulty": "fácil",
+    "duration": "10 min"
+  },
+  {
+    "id": 12,
+    "title": "Búscate una planta",
+    "description": "Consigue una planta pequeña y ponla en un lugar visible de tu espacio. Algo vivo en tu entorno cambia sutilmente cómo lo percibes. Cuidar algo es también cuidarte.",
+    "query": "plants succulents flowers indoor nature green",
+    "category": "hogar",
+    "difficulty": "media",
+    "duration": "30 min"
+  },
+  {
+    "id": 13,
+    "title": "Cocina algo nuevo",
+    "description": "Busca una receta que nunca hayas preparado y cocínala hoy. No tiene que ser complicada. El punto no es que quede perfecto, sino que tus manos hagan algo distinto.",
+    "query": "cooking kitchen recipe ingredients food preparation",
+    "category": "aventura",
+    "difficulty": "media",
+    "duration": "60 min"
+  },
+  {
+    "id": 14,
+    "title": "Recuerda ese momento",
+    "description": "Escribe un recuerdo tuyo favorito con el mayor detalle posible. ¿Qué olías? ¿Qué temperatura hacía? ¿Qué música había? Los recuerdos que no se escriben se desvanecen.",
+    "query": "memory nostalgia vintage polaroid moment capture",
+    "category": "creativo",
+    "difficulty": "media",
+    "duration": "20 min"
+  },
+  {
+    "id": 15,
+    "title": "Ordena un rincón",
+    "description": "Elige el rincón más caótico de tu espacio. No toda la casa, solo un rincón. Déjalo mejor de como estaba. El orden en lo pequeño tiene un efecto inesperado en lo grande.",
+    "query": "organized desk workspace minimal clean tidy",
+    "category": "hogar",
+    "difficulty": "fácil",
+    "duration": "20 min"
+  },
+  {
+    "id": 16,
+    "title": "Descubre un artista nuevo",
+    "description": "Busca un artista (música, visual, escritura) que no conozcas y dale 20 minutos genuinos. No el primero de la lista, el segundo o tercero. Alguien que no sea algoritmo.",
+    "query": "art artist gallery painting exhibition creative",
+    "category": "arte",
+    "difficulty": "fácil",
+    "duration": "20 min"
+  },
+  {
+    "id": 17,
+    "title": "Sal sin destino",
+    "description": "Sal a caminar 20 minutos sin saber a dónde vas. Sigue la calle que te llame más. Date permiso de perderte aunque sea un poco. El destino puede esperar.",
+    "query": "walk city adventure explore wandering streets",
+    "category": "aventura",
+    "difficulty": "fácil",
+    "duration": "20 min"
+  },
+  {
+    "id": 18,
+    "title": "Dilo en voz alta",
+    "description": "Llama a alguien importante para ti y dile algo que sientes pero raramente dices. Puede ser amor, admiración, agradecimiento, o simplemente que los extrañas. No lo guardes más.",
+    "query": "phone call connection love friendship warm light",
+    "category": "conexión",
+    "difficulty": "difícil",
+    "duration": "15 min"
+  },
+  {
+    "id": 19,
+    "title": "Encuentra el amanecer",
+    "description": "Busca a qué hora sale el sol mañana y pon una alarma para verlo. No para fotografiarlo necesariamente. Solo para estar presente en ese momento en que el mundo empieza de nuevo.",
+    "query": "sunrise dawn morning golden hour nature sky",
+    "category": "mindfulness",
+    "difficulty": "difícil",
+    "duration": "30 min"
+  },
+  {
+    "id": 20,
+    "title": "Una película de tu infancia",
+    "description": "Pon una película que hayas visto de niño/a y que no hayas revisitado en años. Mírala entera. El contraste entre quien eras y quien eres ahora es una de las cosas más reveladoras.",
+    "query": "cinema movie nostalgia childhood film popcorn",
+    "category": "arte",
+    "difficulty": "fácil",
+    "duration": "120 min"
+  },
+  {
+    "id": 21,
+    "title": "La carta que nunca enviaste",
+    "description": "Escribe una carta a alguien (o a tu yo del pasado) que nunca vas a enviar. Sin censura, sin filtros. A veces las palabras necesitan existir aunque nadie las lea.",
+    "query": "letter writing personal journal vintage paper ink",
+    "category": "creativo",
+    "difficulty": "media",
+    "duration": "30 min"
+  },
+  {
+    "id": 22,
+    "title": "Desintoxicación de 3 horas",
+    "description": "Pon el teléfono en modo avión por 3 horas. Haz lo que quieras en ese tiempo, pero sin pantallas. Verás que el mundo no se acaba y que tú tienes más ideas de las que creías.",
+    "query": "peace calm nature outdoors minimal quiet solitude",
+    "category": "mindfulness",
+    "difficulty": "media",
+    "duration": "3 horas"
+  },
+  {
+    "id": 23,
+    "title": "Aprende algo en 15 minutos",
+    "description": "Elige un tema random que nunca hayas estudiado: una especie animal, un evento histórico, una técnica artística. 15 minutos de aprendizaje puro sobre algo que no necesitas pero que te enriquece.",
+    "query": "learning education knowledge curiosity discovery science",
+    "category": "conocimiento",
+    "difficulty": "fácil",
+    "duration": "15 min"
+  },
+  {
+    "id": 24,
+    "title": "Regala algo que no cuesta dinero",
+    "description": "Dale a alguien algo que no implique dinero: tiempo, ayuda, un dibujo, una recomendación, una palabra específica de aliento. El regalo más raro hoy es la atención genuina.",
+    "query": "gift giving kindness gesture people warmth",
+    "category": "conexión",
+    "difficulty": "media",
+    "duration": "variable"
+  },
+  {
+    "id": 25,
+    "title": "Haz una lista de lo que te gusta",
+    "description": "Escribe una lista de 20 cosas que genuinamente te gustan. No lo que deberías, lo que realmente te gusta. Puede sorprenderte lo que aparece cuando te das permiso de ser honesto.",
+    "query": "list journal personal favorites aesthetic things",
+    "category": "mindfulness",
+    "difficulty": "fácil",
+    "duration": "20 min"
+  }
+]

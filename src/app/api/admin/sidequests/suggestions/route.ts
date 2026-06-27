@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 const ALLOWED_CATEGORIES = ['creativo', 'conexión', 'aventura', 'mindfulness', 'conocimiento', 'arte', 'hogar'];
 const ALLOWED_DIFFICULTIES = ['fácil', 'media', 'difícil'];
-const DEFAULT_MODEL = 'gemini-2.0-flash-lite';
+const DEFAULT_MODEL = 'gemini-2.5-flash-lite';
 
 type SuggestionStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 

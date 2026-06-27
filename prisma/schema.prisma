@@ -1,0 +1,73 @@
+// SideQuest — daily mission tracking
+// Anonymous users use localStorage. Logged-in users (Clerk) sync here.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Entry {
+  id          String    @id @default(cuid())
+  userId      String    // Clerk user ID
+  sidequestId Int
+  date        String    // YYYY-MM-DD (user's local day)
+  completed   Boolean   @default(false)
+  completedAt DateTime?
+  comment     String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+enum SidequestSuggestionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Sidequest {
+  id              Int      @id @default(autoincrement())
+  title           String
+  description     String
+  query           String
+  category        String
+  difficulty      String
+  duration        String
+  active          Boolean  @default(true)
+  source          String   @default("admin")
+  createdByUserId String?
+  createdByEmail  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([active])
+  @@index([category])
+}
+
+model SidequestSuggestion {
+  id                String                    @id @default(cuid())
+  title             String
+  description       String
+  query             String
+  category          String
+  difficulty        String
+  duration          String
+  status            SidequestSuggestionStatus @default(PENDING)
+  prompt            String?
+  model             String?
+  generatedByUserId String?
+  generatedByEmail  String?
+  reviewedAt        DateTime?
+  reviewedByUserId  String?
+  reviewedByEmail   String?
+  createdAt         DateTime                  @default(now())
+  updatedAt         DateTime                  @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+}

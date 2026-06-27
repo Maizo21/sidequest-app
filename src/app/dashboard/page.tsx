@@ -7,11 +7,33 @@ import Link from 'next/link';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { getAllEntries, type DailyEntry } from '@/lib/storage';
-import { sidequests } from '@/lib/sidequests';
+import { type DailyEntry } from '@/lib/storage';
+import { mergeSidequestPool, sidequests, type Sidequest } from '@/lib/sidequests';
 
-function getSidequestById(id: number) {
-  return sidequests.find((s) => s.id === id);
+function getSidequestById(id: number, sidequestPool: Sidequest[]) {
+  return sidequestPool.find((s) => s.id === id);
+}
+
+async function fetchDynamicSidequests(): Promise<Sidequest[]> {
+  try {
+    const response = await fetch('/api/sidequests');
+    if (!response.ok) return [];
+    const data = (await response.json()) as { sidequests?: Sidequest[] };
+    return Array.isArray(data.sidequests) ? data.sidequests : [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchRemoteEntries(): Promise<DailyEntry[]> {
+  try {
+    const response = await fetch('/api/entries');
+    if (!response.ok) return [];
+    const data = (await response.json()) as { entries?: DailyEntry[] };
+    return Array.isArray(data.entries) ? data.entries : [];
+  } catch {
+    return [];
+  }
 }
 
 function getDaysInMonth(year: number, month: number) {
@@ -31,6 +53,7 @@ const DAY_NAMES = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
 export default function DashboardPage() {
   const { isSignedIn, isLoaded, user } = useUser();
   const [entries, setEntries] = useState<DailyEntry[]>([]);
+  const [sidequestPool, setSidequestPool] = useState<Sidequest[]>(sidequests);
   const [currentMonth, setCurrentMonth] = useState(() => new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(() => new Date().getFullYear());
   const [selectedEntry, setSelectedEntry] = useState<DailyEntry | null>(null);
@@ -39,8 +62,26 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!isLoaded || !isSignedIn) return;
-    const allEntries = getAllEntries();
-    setEntries(allEntries);
+
+    let cancelled = false;
+
+    async function loadDashboardData() {
+      const [remoteEntries, dynamicSidequests] = await Promise.all([
+        fetchRemoteEntries(),
+        fetchDynamicSidequests(),
+      ]);
+
+      if (cancelled) return;
+
+      setEntries(remoteEntries);
+      setSidequestPool(mergeSidequestPool(dynamicSidequests));
+    }
+
+    loadDashboardData();
+
+    return () => {
+      cancelled = true;
+    };
   }, [isLoaded, isSignedIn]);
 
   useEffect(() => {
@@ -278,7 +319,11 @@ export default function DashboardPage() {
 
         {/* Selected entry detail */}
         {selectedEntry && (
-          <SelectedEntryCard entry={selectedEntry} onClose={() => setSelectedEntry(null)} />
+          <SelectedEntryCard
+            entry={selectedEntry}
+            sidequestPool={sidequestPool}
+            onClose={() => setSelectedEntry(null)}
+          />
         )}
 
         {/* Recent completions */}
@@ -293,7 +338,7 @@ export default function DashboardPage() {
                 .reverse()
                 .slice(0, 5)
                 .map((entry) => {
-                  const sq = getSidequestById(entry.sidequestId);
+                  const sq = getSidequestById(entry.sidequestId, sidequestPool);
                   return (
                     <div
                       key={entry.date}
@@ -356,9 +401,17 @@ export default function DashboardPage() {
   );
 }
 
-function SelectedEntryCard({ entry, onClose }: { entry: DailyEntry; onClose: () => void }) {
+function SelectedEntryCard({
+  entry,
+  sidequestPool,
+  onClose,
+}: {
+  entry: DailyEntry;
+  sidequestPool: Sidequest[];
+  onClose: () => void;
+}) {
   const cardRef = useRef<HTMLDivElement>(null);
-  const sq = getSidequestById(entry.sidequestId);
+  const sq = getSidequestById(entry.sidequestId, sidequestPool);
 
   useEffect(() => {
     if (!cardRef.current) return;

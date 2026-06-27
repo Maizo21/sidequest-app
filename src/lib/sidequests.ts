@@ -12,6 +12,12 @@ export interface Sidequest {
 
 export const sidequests: Sidequest[] = sidequestsData;
 
+export function mergeSidequestPool(dynamicSidequests: Sidequest[]): Sidequest[] {
+  const staticIds = new Set(sidequests.map((sidequest) => sidequest.id));
+  const uniqueDynamicSidequests = dynamicSidequests.filter((sidequest) => !staticIds.has(sidequest.id));
+  return [...sidequests, ...uniqueDynamicSidequests];
+}
+
 // Seeded random number generator (mulberry32)
 function seededRandom(seed: number): number {
   let t = (seed += 0x6d2b79f5);
@@ -38,11 +44,16 @@ export function getTodayString(): string {
 }
 
 // Get the sidequest for a given user seed + date
-export function getDailySidequest(anonymousId: string, dateStr?: string): Sidequest {
+export function getDailySidequest(
+  anonymousId: string,
+  dateStr?: string,
+  availableSidequests: Sidequest[] = sidequests
+): Sidequest {
   const date = dateStr ?? getTodayString();
+  const pool = availableSidequests.length > 0 ? availableSidequests : sidequests;
   const seed = hashString(anonymousId + date);
-  const index = Math.floor(seededRandom(seed) * sidequests.length);
-  return sidequests[index];
+  const index = Math.floor(seededRandom(seed) * pool.length);
+  return pool[index];
 }
 
 // Category color mapping

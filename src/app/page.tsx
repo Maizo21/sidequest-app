@@ -11,12 +11,19 @@ import SidequestCard from '@/components/SidequestCard';
 import CompletionButton from '@/components/CompletionButton';
 import CompletionModal from '@/components/CompletionModal';
 
-import { getDailySidequest, getTodayString, sidequests as ALL_SIDEQUESTS, type Sidequest } from '@/lib/sidequests';
+import {
+  getDailySidequest,
+  getTodayString,
+  mergeSidequestPool,
+  sidequests as ALL_SIDEQUESTS,
+  type Sidequest,
+} from '@/lib/sidequests';
 import {
   getAnonymousId,
   getTodayEntry,
   saveTodayEntry,
   getAllEntries,
+  type DailyEntry,
 } from '@/lib/storage';
 
 const WEEKDAYS = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
@@ -36,9 +43,56 @@ function calcStreak(entries: { completed: boolean; date: string }[]): number {
   return streak;
 }
 
+function upsertEntry(entries: DailyEntry[], entry: DailyEntry): DailyEntry[] {
+  const index = entries.findIndex((currentEntry) => currentEntry.date === entry.date);
+  if (index < 0) return [...entries, entry];
+  return entries.map((currentEntry, currentIndex) => (currentIndex === index ? entry : currentEntry));
+}
+
+async function fetchDynamicSidequests(): Promise<Sidequest[]> {
+  try {
+    const response = await fetch('/api/sidequests');
+    if (!response.ok) return [];
+    const data = (await response.json()) as { sidequests?: Sidequest[] };
+    return Array.isArray(data.sidequests) ? data.sidequests : [];
+  } catch {
+    return [];
+  }
+}
+
+async function fetchRemoteEntries(): Promise<DailyEntry[]> {
+  try {
+    const response = await fetch('/api/entries');
+    if (!response.ok) return [];
+    const data = (await response.json()) as { entries?: DailyEntry[] };
+    return Array.isArray(data.entries) ? data.entries : [];
+  } catch {
+    return [];
+  }
+}
+
+async function saveRemoteTodayEntry(entry: DailyEntry): Promise<DailyEntry | null> {
+  try {
+    const response = await fetch('/api/entries/today', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(entry),
+    });
+    if (!response.ok) return null;
+    const data = (await response.json()) as { entry?: DailyEntry };
+    return data.entry ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export default function HomePage() {
-  const { isSignedIn, user } = useUser();
+  const { isLoaded, isSignedIn, user } = useUser();
   const [sidequest, setSidequest] = useState<Sidequest | null>(null);
+  const [sidequestPool, setSidequestPool] = useState<Sidequest[]>(ALL_SIDEQUESTS);
+  const [entries, setEntries] = useState<DailyEntry[]>([]);
   const [completed, setCompleted] = useState(false);
   const [dayNumber, setDayNumber] = useState(1);
   const [streak, setStreak] = useState(0);
@@ -48,23 +102,57 @@ export default function HomePage() {
   const stubRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const seed = isSignedIn && user?.id ? user.id : getAnonymousId();
-    const today = getTodayString();
-    const todayEntry = getTodayEntry();
+    if (!isLoaded) return;
 
-    const sq = getDailySidequest(seed, today);
+    let cancelled = false;
 
-    if (!todayEntry) {
-      saveTodayEntry({ sidequestId: sq.id, date: today, completed: false });
+    async function loadDailyState() {
+      const seed = isSignedIn && user?.id ? user.id : getAnonymousId();
+      const today = getTodayString();
+      const dynamicSidequests = await fetchDynamicSidequests();
+      const pool = mergeSidequestPool(dynamicSidequests);
+      const sq = getDailySidequest(seed, today, pool);
+
+      let nextEntries: DailyEntry[] = [];
+      let todayEntry: DailyEntry | null = null;
+
+      if (isSignedIn) {
+        nextEntries = await fetchRemoteEntries();
+        todayEntry = nextEntries.find((entry) => entry.date === today) ?? null;
+
+        if (!todayEntry) {
+          todayEntry =
+            (await saveRemoteTodayEntry({ sidequestId: sq.id, date: today, completed: false })) ??
+            { sidequestId: sq.id, date: today, completed: false };
+          nextEntries = upsertEntry(nextEntries, todayEntry);
+        }
+      } else {
+        todayEntry = getTodayEntry();
+
+        if (!todayEntry) {
+          todayEntry = { sidequestId: sq.id, date: today, completed: false };
+          saveTodayEntry(todayEntry);
+        }
+
+        nextEntries = getAllEntries();
+      }
+
+      if (cancelled) return;
+
+      setSidequestPool(pool);
+      setEntries(nextEntries);
+      setSidequest(sq);
+      setCompleted(todayEntry?.completed ?? false);
+      setDayNumber(Math.max(nextEntries.length, 1));
+      setStreak(calcStreak(nextEntries));
     }
 
-    setSidequest(sq);
-    setCompleted(todayEntry?.completed ?? false);
+    loadDailyState();
 
-    const allEntries = getAllEntries();
-    setDayNumber(Math.max(allEntries.length, 1));
-    setStreak(calcStreak(allEntries));
-  }, [isSignedIn, user?.id]);
+    return () => {
+      cancelled = true;
+    };
+  }, [isLoaded, isSignedIn, user?.id]);
 
   useEffect(() => {
     if (!labelRef.current) return;
@@ -87,43 +175,75 @@ export default function HomePage() {
   const handleComplete = () => {
     if (!sidequest) return;
     const today = getTodayString();
-    const existing = getTodayEntry();
-    saveTodayEntry({
+    const existing = entries.find((entry) => entry.date === today) ?? (!isSignedIn ? getTodayEntry() : null);
+    const entry: DailyEntry = {
       sidequestId: sidequest.id,
       date: today,
       completed: true,
       completedAt: new Date().toISOString(),
       comment: existing?.comment,
-      imageBase64: existing?.imageBase64,
-    });
+      imageBase64: isSignedIn ? undefined : existing?.imageBase64,
+    };
+    const nextEntries = upsertEntry(entries, entry);
+
+    if (isSignedIn) {
+      void saveRemoteTodayEntry(entry);
+    } else {
+      saveTodayEntry(entry);
+    }
+
+    setEntries(nextEntries);
     setCompleted(true);
-    setStreak(calcStreak(getAllEntries()));
+    setDayNumber(Math.max(nextEntries.length, 1));
+    setStreak(calcStreak(nextEntries));
   };
 
   const handleSaveModal = (comment: string, imageBase64?: string) => {
     if (!sidequest) return;
     const today = getTodayString();
-    saveTodayEntry({
+    const entry: DailyEntry = {
       sidequestId: sidequest.id,
       date: today,
       completed: true,
       completedAt: new Date().toISOString(),
       comment,
-      imageBase64,
-    });
+      imageBase64: isSignedIn ? undefined : imageBase64,
+    };
+    const nextEntries = upsertEntry(entries, entry);
+
+    if (isSignedIn) {
+      void saveRemoteTodayEntry(entry);
+    } else {
+      saveTodayEntry(entry);
+    }
+
+    setEntries(nextEntries);
     setCompleted(true);
-    setStreak(calcStreak(getAllEntries()));
+    setDayNumber(Math.max(nextEntries.length, 1));
+    setStreak(calcStreak(nextEntries));
   };
 
   const handleSwap = () => {
     if (!sidequest) return;
     // Pick a random different sidequest
-    const others = ALL_SIDEQUESTS.filter((s) => s.id !== sidequest.id);
+    const others = sidequestPool.filter((s) => s.id !== sidequest.id);
+    if (!others.length) return;
     const next = others[Math.floor(Math.random() * others.length)];
     const today = getTodayString();
-    saveTodayEntry({ sidequestId: next.id, date: today, completed: false });
+    const entry: DailyEntry = { sidequestId: next.id, date: today, completed: false };
+    const nextEntries = upsertEntry(entries, entry);
+
+    if (isSignedIn) {
+      void saveRemoteTodayEntry(entry);
+    } else {
+      saveTodayEntry(entry);
+    }
+
+    setEntries(nextEntries);
     setSidequest(next);
     setCompleted(false);
+    setDayNumber(Math.max(nextEntries.length, 1));
+    setStreak(calcStreak(nextEntries));
   };
 
   if (!sidequest) {
@@ -158,7 +278,7 @@ export default function HomePage() {
         {/* HERO — editorial asymmetric layout */}
         <section
           ref={heroRef}
-          className="relative h-screen overflow-hidden"
+          className="relative min-h-screen overflow-visible md:h-screen md:overflow-hidden"
         >
           {/* Top header label — "SIDEQUEST · JUEVES" */}
           <div
@@ -173,7 +293,7 @@ export default function HomePage() {
 
           {/* Two-column grid */}
           <div
-            className="relative h-full max-w-7xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-6 pt-24 pb-16"
+            className="relative min-h-screen md:h-full max-w-7xl mx-auto px-6 md:px-10 grid grid-cols-1 md:grid-cols-2 gap-6 pt-24 pb-14 md:pb-16"
             style={{ gridTemplateRows: '1fr' }}
           >
             {/* LEFT — scrapbook collage zone (full row height) */}
@@ -327,8 +447,8 @@ function AboutSection() {
           <path d="M12 8v4l3 3" stroke="#5a4f45" strokeWidth="1.5" strokeLinecap="round"/>
         </svg>
       ),
-      title: 'Una al día',
-      desc: 'Sin abrumarte. Una misión por jornada, lista cuando tú lo estés.',
+      title: 'Una a la vez',
+      desc: 'Sin abrumarte. Una misión por día.',
       color: '#f9f0c0',
       rotate: -2,
       tape: 'tape-orange',
@@ -339,8 +459,8 @@ function AboutSection() {
           <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402C1 3.661 4.25 1 7.5 1 9.37 1 11.003 2.013 12 3.5 12.997 2.013 14.63 1 16.5 1 19.75 1 23 3.661 23 7.191c0 4.105-5.37 8.863-11 14.402z" stroke="#5a4f45" strokeWidth="1.5"/>
         </svg>
       ),
-      title: 'Para estar vivo',
-      desc: 'Pequeñas cosas que te recuerdan que la vida pasa ahora, no después.',
+      title: 'Para darle sentido a los días',
+      desc: 'Pequeñas cosas que te hacen estar presente.',
       color: '#f5d5d5',
       rotate: 1.5,
       tape: 'tape-pink',
@@ -352,7 +472,7 @@ function AboutSection() {
           <path d="M8 12l3 3 5-5" stroke="#5a4f45" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       ),
-      title: 'Tu diario',
+      title: 'Lleva un diario',
       desc: 'Si te registras, guardas cada misión. Con notas, fotos, y tu calendario de vida.',
       color: '#d5e4f0',
       rotate: -1,

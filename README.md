@@ -1,36 +1,103 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SideQuest App
 
-## Getting Started
+SideQuest is a Next.js app deployed on Vercel with PostgreSQL hosted on Railway.
 
-First, run the development server:
+## Architecture
+
+- App hosting: Vercel
+- Database: Railway PostgreSQL
+- Auth: Clerk
+- ORM: Prisma
+- Images: Unsplash API
+
+## Local Setup
+
+Create `.env.local` from `.env.local.example` and fill the values:
+
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `DATABASE_URL`
+- `UNSPLASH_ACCESS_KEY`
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL` (optional, defaults to `gemini-2.0-flash-lite`)
+- `ADMIN_EMAILS` (optional, defaults to `hernanamaizp@gmail.com`)
+
+Install and run:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Database
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Prisma uses `DATABASE_URL`. Because the app is hosted on Vercel and the database is on Railway, use Railway's public database URL in Vercel.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create/apply migrations locally:
 
-## Learn More
+```bash
+npm run prisma:migrate:dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Apply migrations to production:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm run prisma:migrate:deploy
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Vercel
 
-## Deploy on Vercel
+Set these environment variables in Vercel:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
+- `CLERK_SECRET_KEY`
+- `DATABASE_URL`
+- `UNSPLASH_ACCESS_KEY`
+- `GEMINI_API_KEY`
+- `GEMINI_MODEL`
+- `ADMIN_EMAILS`
+- `NEXT_PUBLIC_CLERK_SIGN_IN_URL`
+- `NEXT_PUBLIC_CLERK_SIGN_UP_URL`
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL`
+- `NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Build command:
+
+```bash
+npm run build
+```
+
+The build runs `prisma generate` before `next build`.
+
+## Railway
+
+Create a PostgreSQL service in Railway and copy its public `DATABASE_URL`.
+
+Use that value in:
+
+- local `.env.local`
+- Vercel project environment variables
+- any machine or CI job that runs `npm run prisma:migrate:deploy`
+
+## Launch Checklist
+
+- Create the Railway PostgreSQL service.
+- Copy Railway public `DATABASE_URL` into Vercel.
+- Create/configure the Clerk production app.
+- Add the Vercel production domain in Clerk.
+- Add all env vars in Vercel.
+- Run `npm run prisma:migrate:deploy` against Railway.
+- Deploy on Vercel.
+- Test login, complete mission, dashboard, and Unsplash images.
+- Visit `/admin`, generate sidequest suggestions, approve one, and confirm it appears in the daily pool.
+
+## Scripts
+
+- `npm run dev` - start local development.
+- `npm run build` - generate Prisma client and build Next.js.
+- `npm run start` - serve the production build.
+- `npm run lint` - run ESLint.
+- `npm run prisma:generate` - generate Prisma client.
+- `npm run prisma:migrate:dev` - create and apply migrations.
+- `npm run prisma:migrate:deploy` - apply migrations in production.
+- `npm run prisma:studio` - open Prisma Studio.

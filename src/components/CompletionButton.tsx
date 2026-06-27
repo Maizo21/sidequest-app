@@ -88,7 +88,7 @@ export default function CompletionButton({ completed, isSignedIn, onComplete, on
   };
 
   return (
-    <div ref={wrapperRef} className="flex items-stretch gap-3 mt-8 opacity-0 w-full">
+    <div ref={wrapperRef} className="flex flex-col sm:flex-row items-stretch gap-3 mt-6 md:mt-8 opacity-0 w-full">
       <button
         ref={btnRef}
         onClick={handleClick}
@@ -108,7 +108,7 @@ export default function CompletionButton({ completed, isSignedIn, onComplete, on
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M3 8l4 4 6-7" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-            Completé la misión
+            Completado
           </>
         )}
       </button>
@@ -116,7 +116,7 @@ export default function CompletionButton({ completed, isSignedIn, onComplete, on
       {onSwap && !completed && (
         <button
           onClick={onSwap}
-          className="stamp-btn-secondary flex items-center gap-1.5"
+          className="stamp-btn-secondary flex items-center justify-center gap-1.5"
           aria-label="Cambiar misión"
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

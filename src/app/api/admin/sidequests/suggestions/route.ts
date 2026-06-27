@@ -209,7 +209,7 @@ function buildPrompt(customPrompt: string, count: number, context: GenerationCon
   return `Crea ${count} sidequests nuevas para una app personal y privada.
 Prioriza el pedido específico del admin por sobre el contexto general.
 No asumas que la sidequest es en pareja, familiar o romántica salvo que se pida.
-Escribe en español latino/neutro.
+Escribe en español latino/neutro, no español de España ni formas como vosotros, vuestro, habéis, preparad, llevad o escoged.
 Usa tono claro, directo y cálido, dirigido a una persona con "tú" o en infinitivo.
 Deben ser pequeñas.
 Evita actividades muy costosas.

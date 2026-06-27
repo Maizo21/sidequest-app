@@ -9,6 +9,7 @@ function toPublicSuggestion(suggestion: {
   description: string;
   query: string;
   category: string;
+  tag: string | null;
   difficulty: string;
   duration: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -20,6 +21,7 @@ function toPublicSuggestion(suggestion: {
     description: suggestion.description,
     query: suggestion.query,
     category: suggestion.category,
+    tag: suggestion.tag,
     difficulty: suggestion.difficulty,
     duration: suggestion.duration,
     status: suggestion.status,
@@ -80,6 +82,7 @@ export async function PATCH(
         description: suggestion.description,
         query: suggestion.query,
         category: suggestion.category,
+        tag: suggestion.tag,
         difficulty: suggestion.difficulty,
         duration: suggestion.duration,
         source: suggestion.model ? 'gemini' : 'admin',
@@ -112,6 +115,7 @@ export async function PATCH(
       description: result.sidequest.description,
       query: result.sidequest.query,
       category: result.sidequest.category,
+      tag: result.sidequest.tag,
       difficulty: result.sidequest.difficulty,
       duration: result.sidequest.duration,
     },

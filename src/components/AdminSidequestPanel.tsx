@@ -9,6 +9,7 @@ interface Suggestion {
   description: string;
   query: string;
   category: string;
+  tag: string | null;
   difficulty: string;
   duration: string;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -23,6 +24,7 @@ async function readJson(response: Response) {
   const data = (await response.json().catch(() => ({}))) as {
     error?: string;
     suggestions?: Suggestion[];
+    skippedDuplicates?: number;
   };
 
   if (!response.ok) {
@@ -86,9 +88,12 @@ export default function AdminSidequestPanel({ adminEmail }: Props) {
       });
       const data = await readJson(response);
       const newSuggestions = data.suggestions ?? [];
+      const skippedText = data.skippedDuplicates
+        ? ` ${data.skippedDuplicates} duplicada(s) exacta(s) fueron omitidas.`
+        : '';
 
       setSuggestions((current) => [...newSuggestions, ...current]);
-      setMessage(`${newSuggestions.length} sugerencia(s) generada(s). Revísalas antes de publicar.`);
+      setMessage(`${newSuggestions.length} sugerencia(s) generada(s). Revísalas antes de publicar.${skippedText}`);
     } catch (generateError) {
       setError(generateError instanceof Error ? generateError.message : 'No se pudieron generar sugerencias');
     } finally {
@@ -163,9 +168,12 @@ export default function AdminSidequestPanel({ adminEmail }: Props) {
                 <input
                   type="number"
                   min={1}
-                  max={10}
+                  max={25}
                   value={count}
-                  onChange={(event) => setCount(Number(event.target.value))}
+                  onChange={(event) => {
+                    const nextCount = Number(event.target.value);
+                    setCount(Number.isFinite(nextCount) ? Math.min(Math.max(nextCount, 1), 25) : 1);
+                  }}
                   className="rounded-2xl border px-4 py-3 outline-none"
                   style={{
                     background: '#101923',
@@ -235,6 +243,11 @@ export default function AdminSidequestPanel({ adminEmail }: Props) {
                   <span className="rounded-full px-3 py-1" style={{ background: 'rgba(255,109,40,0.16)' }}>
                     {suggestion.category}
                   </span>
+                  {suggestion.tag && (
+                    <span className="rounded-full px-3 py-1" style={{ background: 'rgba(124,185,232,0.16)' }}>
+                      {suggestion.tag}
+                    </span>
+                  )}
                   <span className="rounded-full px-3 py-1" style={{ background: 'rgba(245,236,217,0.08)' }}>
                     {suggestion.difficulty}
                   </span>
